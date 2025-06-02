@@ -191,7 +191,7 @@ curl https://your-domain.com/api/stats
 
 ```bash
 # 克隆仓库
-git clone https://github.com/your-username/xbin.git
+git clone https://github.com/XCQ0607/xbin.git
 cd xbin
 
 # 安装依赖
@@ -242,7 +242,7 @@ npm run deploy
 
 ```bash
 # 方式 A：克隆仓库
-git clone https://github.com/your-username/xbin.git
+git clone https://github.com/XCQ0607/xbin.git
 
 # 方式 B：下载 ZIP 文件
 # 从 GitHub 下载项目 ZIP 文件并解压
@@ -315,7 +315,7 @@ npm run build
 
 #### 1. Fork 仓库
 
-1. 访问 [项目仓库](https://github.com/your-username/xbin)
+1. 访问 [项目仓库](https://github.com/XCQ0607/xbin)
 2. 点击 "Fork" 按钮
 3. Fork 到你的 GitHub 账号
 
@@ -532,7 +532,7 @@ MIT License
 如果你遇到任何问题：
 
 1. 查看 [故障排除](#-故障排除) 部分
-2. 搜索现有的 [Issues](https://github.com/your-username/xbin/issues)
+2. 搜索现有的 [Issues](https://github.com/XCQ0607/xbin/issues)
 3. 创建新的 Issue 并提供详细信息
 4. 加入我们的讨论社区
 
@@ -540,4 +540,4 @@ MIT License
 
 如果这个项目对你有帮助，请给它一个 ⭐️！
 
-[![Star History Chart](https://api.star-history.com/svg?repos=your-username/xbin&type=Date)](https://star-history.com/#your-username/xbin&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=XCQ0607/xbin&type=Date)](https://star-history.com/#XCQ0607/xbin&Date)

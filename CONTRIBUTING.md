@@ -8,7 +8,7 @@
 
 如果你发现了 bug，请：
 
-1. 检查 [Issues](https://github.com/your-username/xbin/issues) 确认问题未被报告
+1. 检查 [Issues](https://github.com/XCQ0607/xbin/issues) 确认问题未被报告
 2. 创建新的 Issue，包含：
    - 清晰的标题和描述
    - 重现步骤
@@ -31,7 +31,7 @@
 
 ```bash
 # 1. Fork 仓库并克隆
-git clone https://github.com/your-username/xbin.git
+git clone https://github.com/XCQ0607/xbin.git
 cd xbin
 
 # 2. 安装依赖

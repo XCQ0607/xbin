@@ -27,8 +27,8 @@ git commit -m "🎉 Initial commit: XBin 现代化粘贴板服务"
 ### 第三步：连接本地仓库到 GitHub
 
 ```bash
-# 添加远程仓库（替换 your-username 为你的 GitHub 用户名）
-git remote add origin https://github.com/your-username/xbin.git
+# 添加远程仓库
+git remote add origin git@github.com:XCQ0607/xbin.git
 
 # 推送代码到 GitHub
 git branch -M main
@@ -99,7 +99,7 @@ git config --global user.email "your-email@example.com"
 1. **下载项目**
    ```bash
    # 从 GitHub 下载
-   git clone https://github.com/your-username/xbin.git
+   git clone https://github.com/XCQ0607/xbin.git
    cd xbin
    npm install
    ```
