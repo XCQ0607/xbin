@@ -8,6 +8,7 @@
 
 - **演示地址**: [https://xbin.pages.dev](https://xbin.pages.dev)
 - **后台管理**: [https://xbin.pages.dev/admin](https://xbin.pages.dev/admin) (用户名: admin, 密码: password)
+- **GitHub仓库**: [https://github.com/XCQ0607/xbin](https://github.com/XCQ0607/xbin)
 
 ## ✨ 特性
 
