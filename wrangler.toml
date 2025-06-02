@@ -1,0 +1,8 @@
+name = "xbin"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "."
+
+[[kv_namespaces]]
+binding = "PASTEBIN_KV"
+id = "be2a0ba6f8da40a6825fd77e1474646d"
+preview_id = "d652e7b16d214415a268b4f84c182976"

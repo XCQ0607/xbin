@@ -1,0 +1,23 @@
+{
+  "name": "xbin",
+  "version": "1.0.0",
+  "description": "A web pastebin service deployed on Cloudflare Pages with KV storage",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler pages dev .",
+    "deploy": "wrangler pages deploy . --project-name xbin",
+    "deploy-worker": "wrangler deploy",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "pastebin",
+    "kv"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

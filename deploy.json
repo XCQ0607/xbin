@@ -1,0 +1,27 @@
+{
+  "name": "XBin - 现代化粘贴板服务",
+  "description": "一个功能完整的现代化中文粘贴板服务，支持密码保护、过期时间设置、后台管理和完整的 API 接口。",
+  "repository": "https://github.com/your-username/xbin",
+  "logo": "https://raw.githubusercontent.com/your-username/xbin/main/logo.png",
+  "success_url": "/",
+  "env": {
+    "ADMIN_USER": {
+      "description": "管理员用户名",
+      "value": "admin",
+      "required": false
+    },
+    "ADMIN_PASSWORD": {
+      "description": "管理员密码",
+      "value": "password",
+      "required": false
+    }
+  },
+  "formation": {
+    "worker": {
+      "quantity": 1
+    }
+  },
+  "addons": [],
+  "buildpacks": [],
+  "stack": "cloudflare-pages"
+}
