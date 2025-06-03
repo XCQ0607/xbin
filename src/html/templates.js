@@ -819,7 +819,6 @@ async function showStats() {
               <p style="margin: 0;"><strong>说明：</strong></p>
               <p style="margin: 5px 0 0 0;">• 统计数据实时更新，只包含当前有效的粘贴板</p>
               <p style="margin: 5px 0 0 0;">• 已过期和已删除的粘贴板不计入统计</p>
-              <p style="margin: 5px 0 0 0;">• 数据与后台管理保持一致</p>
             </div>
             <button onclick="closeStats()" class="btn" style="margin-top: 20px;">关闭</button>
           </div>
