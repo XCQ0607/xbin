@@ -642,6 +642,24 @@ textarea.form-control {
     right: 10px;
     font-size: 14px;
   }
+
+  /* 快速访问区域优化 */
+  .quick-access-container {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .quick-access-btn {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 14px 20px !important;
+    font-size: 16px !important;
+  }
+
+  #quickAccessId {
+    font-size: 16px !important;
+    padding: 14px 16px !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -683,6 +701,22 @@ textarea.form-control {
 
   .stat-number {
     font-size: 1.8rem;
+  }
+
+  /* 快速访问区域进一步优化 */
+  .quick-access-container {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .quick-access-btn {
+    padding: 16px 20px !important;
+    font-size: 16px !important;
+  }
+
+  #quickAccessId {
+    padding: 16px !important;
+    font-size: 16px !important;
   }
 }
 </style>
@@ -1167,9 +1201,9 @@ export function getHomePage() {
       <h3>🔍 快速访问</h3>
       <div class="form-group">
         <label for="quickAccessId">输入粘贴板 ID</label>
-        <div style="display: flex; gap: 10px;">
+        <div class="quick-access-container" style="display: flex; gap: 10px;">
           <input type="text" id="quickAccessId" class="form-control" placeholder="输入粘贴板 ID..." style="flex: 1;">
-          <button type="button" class="btn" onclick="quickAccess()">访问</button>
+          <button type="button" class="btn quick-access-btn" onclick="quickAccess()">访问</button>
         </div>
         <small style="color: #666;">输入已知的粘贴板 ID 快速跳转</small>
       </div>
