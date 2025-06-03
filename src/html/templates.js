@@ -804,7 +804,7 @@ async function showStats() {
             <div class="stats-grid">
               <div class="stat-item">
                 <div class="stat-number">\${stats.totalPastes || 0}</div>
-                <div class="stat-label">总粘贴板数</div>
+                <div class="stat-label">活跃粘贴板数</div>
               </div>
               <div class="stat-item">
                 <div class="stat-number">\${stats.totalViews || 0}</div>
@@ -815,7 +815,13 @@ async function showStats() {
                 <div class="stat-label">今日新增</div>
               </div>
             </div>
-            <button onclick="closeStats()" class="btn">关闭</button>
+            <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.05); border-radius: 8px; font-size: 14px; color: #666;">
+              <p style="margin: 0;"><strong>说明：</strong></p>
+              <p style="margin: 5px 0 0 0;">• 统计数据实时更新，只包含当前有效的粘贴板</p>
+              <p style="margin: 5px 0 0 0;">• 已过期和已删除的粘贴板不计入统计</p>
+              <p style="margin: 5px 0 0 0;">• 数据与后台管理保持一致</p>
+            </div>
+            <button onclick="closeStats()" class="btn" style="margin-top: 20px;">关闭</button>
           </div>
         </div>
       \`;
@@ -1117,6 +1123,208 @@ export function getPastePage(pasteId, paste = null, requirePassword = false, err
     document.getElementById('edit-section').style.display = 'none';
   }
   </script>
+</body>
+</html>`;
+}
+
+export function getErrorPage(errorType = 'not_found', pasteId = '', currentDomain = '') {
+  let title, heading, message, icon, suggestions;
+
+  switch (errorType) {
+    case 'not_found':
+      title = '粘贴板未找到 - XBin';
+      heading = '😕 粘贴板未找到';
+      icon = '🔍';
+      message = `抱歉，粘贴板 "${sanitizeHtml(pasteId)}" 不存在或已被删除。`;
+      suggestions = [
+        '检查链接是否正确',
+        '粘贴板可能已过期',
+        '粘贴板可能已被删除',
+        '创建一个新的粘贴板'
+      ];
+      break;
+    case 'expired':
+      title = '粘贴板已过期 - XBin';
+      heading = '⏰ 粘贴板已过期';
+      icon = '⌛';
+      message = `粘贴板 "${sanitizeHtml(pasteId)}" 已过期并被自动删除。`;
+      suggestions = [
+        '粘贴板已超过设定的过期时间',
+        '过期的粘贴板会被自动清理',
+        '创建一个新的粘贴板',
+        '设置更长的过期时间'
+      ];
+      break;
+    case 'password_required':
+      title = '需要密码 - XBin';
+      heading = '🔒 需要密码';
+      icon = '🔐';
+      message = `粘贴板 "${sanitizeHtml(pasteId)}" 受密码保护。`;
+      suggestions = [
+        '请输入正确的密码',
+        '联系分享者获取密码',
+        '密码区分大小写',
+        '创建一个新的粘贴板'
+      ];
+      break;
+    default:
+      title = '出错了 - XBin';
+      heading = '❌ 出错了';
+      icon = '⚠️';
+      message = '发生了未知错误。';
+      suggestions = [
+        '请稍后重试',
+        '检查网络连接',
+        '联系技术支持',
+        '返回首页'
+      ];
+  }
+
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title}</title>
+  ${CSS_STYLES}
+  <style>
+  .error-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .error-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .error-heading {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+
+  .error-message {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.6;
+  }
+
+  .suggestions {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 30px;
+    margin: 30px 0;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    text-align: left;
+  }
+
+  .suggestions h3 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .suggestions ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .suggestions li {
+    padding: 8px 0;
+    color: #555;
+    position: relative;
+    padding-left: 25px;
+  }
+
+  .suggestions li::before {
+    content: '💡';
+    position: absolute;
+    left: 0;
+    top: 8px;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 30px;
+  }
+
+  .btn-large {
+    padding: 16px 32px;
+    font-size: 16px;
+    min-width: 160px;
+  }
+
+  @media (max-width: 768px) {
+    .error-container {
+      padding: 10px;
+    }
+
+    .error-heading {
+      font-size: 1.5rem;
+    }
+
+    .suggestions {
+      padding: 20px;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .btn-large {
+      width: 100%;
+      max-width: 300px;
+    }
+  }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="error-container">
+      <div class="header">
+        <span class="error-icon">${icon}</span>
+        <h1 class="error-heading">${heading}</h1>
+        <p class="error-message">${message}</p>
+      </div>
+
+      <div class="suggestions">
+        <h3>💡 可能的原因</h3>
+        <ul>
+          ${suggestions.map(suggestion => `<li>${suggestion}</li>`).join('')}
+        </ul>
+      </div>
+
+      <div class="action-buttons">
+        <a href="/" class="btn btn-large">🏠 返回首页</a>
+        <a href="/" class="btn btn-success btn-large">➕ 创建粘贴板</a>
+        ${errorType === 'password_required' ?
+          `<button onclick="history.back()" class="btn btn-info btn-large">🔙 重新输入密码</button>` :
+          `<button onclick="history.back()" class="btn btn-secondary btn-large">🔙 返回上页</button>`
+        }
+      </div>
+
+      <div class="footer" style="margin-top: 50px;">
+        <p>基于 Cloudflare Pages 构建 • <a href="/api" style="color: rgba(255,255,255,0.8);">API 文档</a> • <a href="/admin" style="color: rgba(255,255,255,0.8);">🔐 后台管理</a> • <a href="https://github.com/XCQ0607/xbin" target="_blank" style="color: rgba(255,255,255,0.8);">📦 GitHub</a></p>
+      </div>
+    </div>
+  </div>
+
+  ${JAVASCRIPT}
 </body>
 </html>`;
 }

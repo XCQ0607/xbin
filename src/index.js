@@ -1,5 +1,5 @@
 import { generateId, hashPassword, verifyPassword, isExpired } from './utils.js';
-import { getHomePage, getPastePage, getApiDocPage } from './html/templates.js';
+import { getHomePage, getPastePage, getApiDocPage, getErrorPage } from './html/templates.js';
 import { getAdminLoginPage, getAdminDashboardPage } from './html/admin.js';
 
 export default {
@@ -330,9 +330,9 @@ async function handlePaste(pasteId, request, env, corsHeaders) {
     const currentDomain = requestUrl.origin;
 
     if (!pasteData) {
-      return new Response('Paste not found', {
+      return new Response(getErrorPage('not_found', pasteId, currentDomain), {
         status: 404,
-        headers: corsHeaders
+        headers: { 'Content-Type': 'text/html; charset=utf-8', ...corsHeaders }
       });
     }
 
@@ -341,9 +341,9 @@ async function handlePaste(pasteId, request, env, corsHeaders) {
     // Check if expired
     if (isExpired(paste)) {
       await env.PASTEBIN_KV.delete(pasteId);
-      return new Response('Paste has expired', {
+      return new Response(getErrorPage('expired', pasteId, currentDomain), {
         status: 410,
-        headers: corsHeaders
+        headers: { 'Content-Type': 'text/html; charset=utf-8', ...corsHeaders }
       });
     }
 
@@ -382,48 +382,13 @@ async function handlePaste(pasteId, request, env, corsHeaders) {
 
 async function getStats(env, corsHeaders) {
   try {
-    // 获取所有粘贴板的键
-    const { keys } = await env.PASTEBIN_KV.list();
-
-    let totalPastes = 0;
-    let totalViews = 0;
-    let todayPastes = 0;
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayTimestamp = today.getTime();
-
-    // 遍历所有粘贴板统计信息
-    for (const key of keys) {
-      try {
-        const pasteData = await env.PASTEBIN_KV.get(key.name);
-        if (pasteData) {
-          const paste = JSON.parse(pasteData);
-
-          // 跳过已过期的粘贴板
-          if (isExpired(paste)) {
-            await env.PASTEBIN_KV.delete(key.name);
-            continue;
-          }
-
-          totalPastes++;
-          totalViews += paste.views || 0;
-
-          // 检查是否是今天创建的
-          if (paste.createdAt >= todayTimestamp) {
-            todayPastes++;
-          }
-        }
-      } catch (error) {
-        // 忽略单个粘贴板的错误，继续统计其他的
-        console.error('Error processing paste:', key.name, error);
-      }
-    }
+    // 使用统一的统计函数
+    const stats = await getUnifiedStats(env);
 
     return new Response(JSON.stringify({
-      totalPastes,
-      totalViews,
-      todayPastes,
+      totalPastes: stats.totalPastes,
+      totalViews: stats.totalViews,
+      todayPastes: stats.todayPastes,
       success: true
     }), {
       headers: { 'Content-Type': 'application/json', ...corsHeaders }
@@ -439,6 +404,102 @@ async function getStats(env, corsHeaders) {
       status: 500,
       headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
+  }
+}
+
+// 统一的统计函数，确保前台和后台数据一致
+async function getUnifiedStats(env) {
+  try {
+    console.log('🔍 开始统计数据...');
+
+    // 获取所有键
+    const { keys } = await env.PASTEBIN_KV.list();
+    console.log(`📋 总键数: ${keys.length}`);
+
+    let totalPastes = 0;
+    let totalViews = 0;
+    let todayPastes = 0;
+    let activePastes = 0;
+    let sessionKeys = 0;
+    let expiredKeys = 0;
+    let errorKeys = 0;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayTimestamp = today.getTime();
+
+    // 遍历所有键
+    for (const key of keys) {
+      try {
+        // 跳过管理员会话键
+        if (key.name.startsWith('admin_session:')) {
+          sessionKeys++;
+          continue;
+        }
+
+        const pasteData = await env.PASTEBIN_KV.get(key.name);
+        if (!pasteData) {
+          console.log(`⚠️ 键 ${key.name} 没有数据，跳过`);
+          continue;
+        }
+
+        const paste = JSON.parse(pasteData);
+
+        // 检查是否过期
+        if (isExpired(paste)) {
+          console.log(`⏰ 粘贴板 ${key.name} 已过期，删除`);
+          await env.PASTEBIN_KV.delete(key.name);
+          expiredKeys++;
+          continue;
+        }
+
+        // 统计有效粘贴板
+        totalPastes++;
+        activePastes++;
+        totalViews += paste.views || 0;
+
+        // 检查是否是今天创建的
+        if (paste.createdAt >= todayTimestamp) {
+          todayPastes++;
+        }
+
+      } catch (error) {
+        console.error(`❌ 处理键 ${key.name} 时出错:`, error);
+        errorKeys++;
+      }
+    }
+
+    console.log(`📊 统计完成:`, {
+      totalKeys: keys.length,
+      sessionKeys,
+      expiredKeys,
+      errorKeys,
+      totalPastes,
+      activePastes,
+      totalViews,
+      todayPastes
+    });
+
+    return {
+      totalPastes,
+      totalViews,
+      todayPastes,
+      activePastes,
+      sessionKeys,
+      expiredKeys,
+      errorKeys
+    };
+  } catch (error) {
+    console.error('❌ 统计数据时出错:', error);
+    return {
+      totalPastes: 0,
+      totalViews: 0,
+      todayPastes: 0,
+      activePastes: 0,
+      sessionKeys: 0,
+      expiredKeys: 0,
+      errorKeys: 0
+    };
   }
 }
 
@@ -576,7 +637,7 @@ async function handleAdminDashboard(request, env, corsHeaders) {
     const pageSize = 20;
 
     // 获取统计信息
-    const stats = await getAdminStats(env);
+    const stats = await getUnifiedStats(env);
 
     // 获取粘贴板列表
     const { keys } = await env.PASTEBIN_KV.list();
@@ -631,62 +692,7 @@ async function handleAdminDashboard(request, env, corsHeaders) {
   }
 }
 
-// 获取管理统计信息
-async function getAdminStats(env) {
-  try {
-    const { keys } = await env.PASTEBIN_KV.list();
 
-    let totalPastes = 0;
-    let totalViews = 0;
-    let todayPastes = 0;
-    let activePastes = 0;
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayTimestamp = today.getTime();
-
-    for (const key of keys) {
-      if (key.name.startsWith('admin_session:')) continue;
-
-      try {
-        const pasteData = await env.PASTEBIN_KV.get(key.name);
-        if (pasteData) {
-          const paste = JSON.parse(pasteData);
-
-          if (isExpired(paste)) {
-            await env.PASTEBIN_KV.delete(key.name);
-            continue;
-          }
-
-          totalPastes++;
-          totalViews += paste.views || 0;
-          activePastes++;
-
-          if (paste.createdAt >= todayTimestamp) {
-            todayPastes++;
-          }
-        }
-      } catch (error) {
-        console.error('Error processing paste for stats:', key.name, error);
-      }
-    }
-
-    return {
-      totalPastes,
-      totalViews,
-      todayPastes,
-      activePastes
-    };
-  } catch (error) {
-    console.error('Stats error:', error);
-    return {
-      totalPastes: 0,
-      totalViews: 0,
-      todayPastes: 0,
-      activePastes: 0
-    };
-  }
-}
 
 // 处理管理API
 async function handleAdminAPI(request, env, corsHeaders) {

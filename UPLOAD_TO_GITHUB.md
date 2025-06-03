@@ -57,6 +57,7 @@ git config --global user.email "your-email@example.com"
 ### 3. 验证上传成功
 
 上传完成后，访问你的 GitHub 仓库页面，应该能看到：
+
 - ✅ 所有源代码文件
 - ✅ README.md 显示项目介绍
 - ✅ 不包含 node_modules 等不需要的文件
@@ -66,45 +67,47 @@ git config --global user.email "your-email@example.com"
 ### 方法一：连接 GitHub 仓库（推荐）
 
 1. **登录 Cloudflare Dashboard**
+
    - 访问 [Cloudflare Dashboard](https://dash.cloudflare.com)
    - 进入 "Pages" 部分
-
 2. **创建新项目**
+
    - 点击 "Create a project"
    - 选择 "Connect to Git"
    - 选择 GitHub
    - 授权 Cloudflare 访问你的 GitHub
-
 3. **选择仓库**
+
    - 找到并选择 `xbin` 仓库
    - 点击 "Begin setup"
-
 4. **配置构建设置**
+
    - **Project name**: `xbin`
    - **Production branch**: `main`
    - **Build command**: `npm run build`（可选）
    - **Build output directory**: `.`
    - **Root directory**: `/`（默认）
-
 5. **环境变量**（可选）
+
    - `ADMIN_USER`: `admin`
    - `ADMIN_PASSWORD`: `password`
-
 6. **部署**
+
    - 点击 "Save and Deploy"
    - 等待部署完成
 
 ### 方法二：手动上传
 
 1. **下载项目**
+
    ```bash
    # 从 GitHub 下载
    git clone https://github.com/XCQ0607/xbin.git
    cd xbin
    npm install
    ```
-
 2. **上传到 Cloudflare Pages**
+
    - 在 Cloudflare Dashboard 中选择 "Upload assets"
    - 拖拽项目文件夹到上传区域
    - 等待上传完成
@@ -114,18 +117,19 @@ git config --global user.email "your-email@example.com"
 无论使用哪种部署方法，都需要配置 KV 存储：
 
 1. **创建 KV 命名空间**
+
    - 在 Cloudflare Dashboard 中进入 "Workers & Pages"
    - 点击 "KV" 标签
    - 创建名为 `PASTEBIN_KV` 的命名空间
-
 2. **绑定到 Pages 项目**
+
    - 进入你的 Pages 项目设置
    - 找到 "Functions" → "KV namespace bindings"
    - 添加绑定：
      - Variable name: `PASTEBIN_KV`
      - KV namespace: 选择刚创建的命名空间
-
 3. **重新部署**
+
    - 触发重新部署以应用配置
 
 ## 🎯 自动化部署
@@ -136,10 +140,11 @@ git config --global user.email "your-email@example.com"
 
 1. **设置 Secrets**
    在 GitHub 仓库设置中添加：
+
    - `CLOUDFLARE_API_TOKEN`: Cloudflare API 令牌
    - `CLOUDFLARE_ACCOUNT_ID`: Cloudflare 账户 ID
-
 2. **自动触发**
+
    - 每次推送到 `main` 分支时自动部署
    - Pull Request 时自动构建预览
 
@@ -179,12 +184,14 @@ scripts\setup.bat
 ## 🎉 完成！
 
 恭喜！你的 XBin 项目现在已经：
+
 - ✅ 上传到 GitHub
 - ✅ 部署到 Cloudflare Pages
 - ✅ 配置了自动部署
 - ✅ 可以在线访问
 
 现在你可以：
+
 1. 分享你的项目链接
 2. 接受其他开发者的贡献
 3. 继续开发新功能
@@ -193,6 +200,7 @@ scripts\setup.bat
 ## 📞 需要帮助？
 
 如果遇到问题：
+
 1. 查看 [故障排除指南](README.md#-故障排除)
 2. 检查 Cloudflare Pages 部署日志
 3. 在 GitHub 创建 Issue
