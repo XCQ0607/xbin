@@ -553,35 +553,131 @@ body::before {
   }
 }
 
+/* 默认隐藏移动端布局 */
+.mobile-card-view {
+  display: none;
+}
+
 @media (max-width: 768px) {
+  .admin-header {
+    padding: 0 15px;
+  }
+
   .admin-nav {
-    padding: 0 10px;
+    height: auto;
+    min-height: 60px;
+    padding: 15px 0;
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .admin-logo {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .admin-user {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
   .admin-content {
-    padding: 10px;
+    padding: 15px 10px;
   }
 
   .stats-grid {
     grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+
+  .stat-card {
+    padding: 20px;
+  }
+
+  .stat-number {
+    font-size: 2.5rem;
   }
 
   .table-header {
     flex-direction: column;
     gap: 15px;
     align-items: stretch;
+    padding: 15px;
+  }
+
+  .table-title {
+    text-align: center;
+    font-size: 1.1rem;
   }
 
   .table-actions {
     justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .data-table-container {
+    border-radius: 12px;
+    overflow-x: auto;
   }
 
   .data-table {
-    font-size: 14px;
+    font-size: 12px;
+    min-width: 600px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 8px 6px;
+    white-space: nowrap;
   }
 
   .text-truncate {
-    max-width: 100px;
+    max-width: 80px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .btn-xs {
+    padding: 6px 8px;
+    font-size: 11px;
+    width: 100%;
+    min-width: 60px;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 15px 10px;
+  }
+
+  .pagination button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .custom-modal-content {
+    padding: 25px 20px;
+    margin: 20px;
+    width: calc(100% - 40px);
+  }
+
+  .custom-modal h3 {
+    font-size: 1.3rem;
+  }
+
+  .custom-modal-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .custom-modal .btn {
+    width: 100%;
   }
 
   .toast {
@@ -589,6 +685,101 @@ body::before {
     right: 10px;
     left: 10px;
     max-width: none;
+    font-size: 14px;
+  }
+
+  /* 表格卡片式布局 */
+  .mobile-card-view {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-content {
+    padding: 10px 5px;
+  }
+
+  .stats-grid {
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 15px;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+  }
+
+  .stat-label {
+    font-size: 1rem;
+  }
+
+  .data-table {
+    min-width: 500px;
+  }
+
+  .text-truncate {
+    max-width: 60px;
+  }
+
+  /* 隐藏表格，显示卡片式布局 */
+  .data-table {
+    display: none !important;
+  }
+
+  .mobile-card-view {
+    display: block !important;
+    padding: 15px;
+  }
+
+  .mobile-paste-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #667eea;
+  }
+
+  .mobile-paste-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .mobile-paste-id {
+    font-family: monospace;
+    font-weight: bold;
+    color: #333;
+    font-size: 14px;
+  }
+
+  .mobile-paste-content {
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+
+  .mobile-paste-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 10px;
+  }
+
+  .mobile-paste-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .mobile-paste-actions .btn-xs {
+    flex: 1;
+    min-width: 70px;
   }
 }
 </style>
@@ -769,6 +960,29 @@ export function getAdminDashboardPage(stats, pastes, currentPage = 1, totalPages
             ${pastesHtml}
           </tbody>
         </table>
+
+        <!-- 移动端卡片式布局 -->
+        <div class="mobile-card-view">
+          ${pastes.map(paste => `
+            <div class="mobile-paste-card">
+              <div class="mobile-paste-header">
+                <div class="mobile-paste-id">${paste.id}</div>
+                <input type="checkbox" class="paste-checkbox" value="${paste.id}" onchange="updateSelectedCount()">
+              </div>
+              <div class="mobile-paste-content">${paste.content}</div>
+              <div class="mobile-paste-meta">
+                <div><strong>创建:</strong> ${new Date(paste.createdAt).toLocaleDateString('zh-CN')}</div>
+                <div><strong>查看:</strong> ${paste.views}次</div>
+                <div><strong>过期:</strong> ${paste.expiresAt ? new Date(paste.expiresAt).toLocaleDateString('zh-CN') : '永不'}</div>
+                <div><strong>状态:</strong> ${paste.hasPassword ? '🔒有密码' : '🔓无密码'}</div>
+              </div>
+              <div class="mobile-paste-actions">
+                <button class="btn btn-xs btn-success" onclick="editPaste('${paste.id}')">编辑</button>
+                <button class="btn btn-xs btn-danger" onclick="deletePaste('${paste.id}')">删除</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
 
         ${totalPages > 1 ? `
         <div class="pagination">

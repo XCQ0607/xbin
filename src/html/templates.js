@@ -501,19 +501,103 @@ textarea.form-control {
 
 @media (max-width: 768px) {
   .container {
-    padding: 10px;
+    padding: 15px 10px;
   }
 
   .header h1 {
     font-size: 2rem;
   }
 
+  .header p {
+    font-size: 1rem;
+  }
+
   .card {
-    padding: 20px;
+    padding: 20px 15px;
+    margin-bottom: 20px;
   }
 
   .row {
     flex-direction: column;
+    gap: 15px;
+  }
+
+  .col {
+    min-width: auto;
+  }
+
+  .form-control {
+    font-size: 16px; /* 防止iOS缩放 */
+  }
+
+  .btn {
+    padding: 14px 20px;
+    font-size: 16px;
+    margin: 5px;
+    width: calc(50% - 10px);
+    min-width: auto;
+  }
+
+  .btn-github {
+    width: 100%;
+    justify-content: center;
+    margin: 10px 0;
+  }
+
+  .paste-info {
+    padding: 12px;
+    font-size: 13px;
+  }
+
+  .paste-info span {
+    display: block;
+    margin-bottom: 8px;
+    margin-right: 0;
+  }
+
+  .paste-content {
+    padding: 15px;
+    margin: 15px 0;
+  }
+
+  .paste-text {
+    font-size: 13px;
+    padding: 15px;
+    line-height: 1.5;
+  }
+
+  .copy-btn {
+    top: 8px;
+    right: 8px;
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .stats-content {
+    padding: 25px 20px;
+    margin: 20px;
+    width: calc(100% - 40px);
+  }
+
+  .stats-content h3 {
+    font-size: 1.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .stat-item {
+    padding: 20px 15px;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
   }
 
   .toast {
@@ -521,6 +605,84 @@ textarea.form-control {
     right: 10px;
     left: 10px;
     max-width: none;
+    font-size: 14px;
+  }
+
+  /* 粘贴板页面按钮布局 */
+  .paste-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .paste-actions .btn {
+    flex: 1;
+    min-width: 120px;
+    max-width: 150px;
+    margin: 0;
+  }
+
+  /* 编辑区域优化 */
+  #edit-section {
+    margin-top: 15px;
+    padding-top: 15px;
+  }
+
+  #edit-content {
+    min-height: 150px;
+    font-size: 14px;
+  }
+
+  .password-input-container .form-control {
+    padding-right: 40px;
+  }
+
+  .password-toggle {
+    right: 10px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 10px 5px;
+  }
+
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
+  .card {
+    padding: 15px 10px;
+  }
+
+  .btn {
+    width: 100%;
+    margin: 5px 0;
+  }
+
+  .paste-actions .btn {
+    width: 100%;
+    max-width: none;
+  }
+
+  .paste-info span {
+    font-size: 12px;
+  }
+
+  .paste-text {
+    font-size: 12px;
+  }
+
+  .stats-content {
+    padding: 20px 15px;
+    margin: 15px;
+    width: calc(100% - 30px);
+  }
+
+  .stat-number {
+    font-size: 1.8rem;
   }
 }
 </style>
@@ -640,8 +802,21 @@ async function createPaste() {
 }
 
 async function updatePaste(pasteId) {
-  const content = document.getElementById('content').value;
-  const password = document.getElementById('password').value;
+  const contentField = document.getElementById('edit-content');
+  const passwordField = document.getElementById('edit-password');
+
+  if (!contentField) {
+    showAlert('编辑区域未找到，请刷新页面重试', 'error');
+    return;
+  }
+
+  const content = contentField.value.trim();
+  const password = passwordField ? passwordField.value : '';
+
+  if (!content) {
+    showAlert('内容不能为空', 'error');
+    return;
+  }
 
   const data = {
     content: content,
@@ -649,6 +824,8 @@ async function updatePaste(pasteId) {
   };
 
   try {
+    showAlert('正在保存更改...', 'info');
+
     const response = await fetch(\`/api/paste/\${pasteId}\`, {
       method: 'PUT',
       headers: {
@@ -663,12 +840,12 @@ async function updatePaste(pasteId) {
       showAlert('粘贴板更新成功！', 'success');
       setTimeout(() => {
         window.location.reload();
-      }, 1000);
+      }, 1500);
     } else {
       showAlert(result.error || '更新粘贴板失败', 'error');
     }
   } catch (error) {
-    showAlert('网络错误', 'error');
+    showAlert('网络错误: ' + error.message, 'error');
   }
 }
 
@@ -677,7 +854,9 @@ async function deletePaste(pasteId) {
     return;
   }
 
-  const password = document.getElementById('password').value;
+  // 获取密码字段的值，如果字段不存在或为空则为null
+  const passwordField = document.getElementById('password');
+  const password = passwordField ? passwordField.value : '';
   const url = \`/api/paste/\${pasteId}\` + (password ? \`?password=\${encodeURIComponent(password)}\` : '');
 
   try {
@@ -693,7 +872,12 @@ async function deletePaste(pasteId) {
         window.location.href = '/';
       }, 1000);
     } else {
-      showAlert(result.error || '删除粘贴板失败', 'error');
+      // 如果是密码错误，提示用户先编辑以输入密码
+      if (result.error && result.error.includes('密码')) {
+        showAlert('此粘贴板受密码保护，请先点击"编辑"按钮输入密码后再删除', 'error');
+      } else {
+        showAlert(result.error || '删除粘贴板失败', 'error');
+      }
     }
   } catch (error) {
     showAlert('网络错误', 'error');
@@ -1076,27 +1260,28 @@ export function getPastePage(pasteId, paste = null, requirePassword = false, err
         <div class="paste-text">${content}</div>
       </div>
 
-      <div style="margin-top: 20px;">
-        <a href="/" class="btn btn-secondary">创建新粘贴板</a>
-        <button type="button" class="btn" onclick="editPaste()">编辑</button>
-        <button type="button" class="btn btn-danger" onclick="deletePaste('${pasteId}')">删除</button>
-        <button type="button" class="btn btn-info" onclick="sharePaste('${currentUrl}')">分享</button>
-        <button type="button" class="btn btn-success" onclick="downloadPaste('${pasteId}')">下载</button>
+      <div class="paste-actions" style="margin-top: 20px;">
+        <a href="/" class="btn btn-secondary">🏠 首页</a>
+        <button type="button" class="btn" onclick="editPaste()">✏️ 编辑</button>
+        <button type="button" class="btn btn-danger" onclick="deletePaste('${pasteId}')">🗑️ 删除</button>
+        <button type="button" class="btn btn-info" onclick="sharePaste('${currentUrl}')">📤 分享</button>
+        <button type="button" class="btn btn-success" onclick="downloadPaste('${pasteId}')">💾 下载</button>
       </div>
 
       <div id="edit-section" style="display: none; margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
         <div class="form-group">
-          <label for="content">编辑内容</label>
-          <textarea id="content" class="form-control">${content}</textarea>
+          <label for="edit-content">编辑内容</label>
+          <textarea id="edit-content" class="form-control" style="min-height: 200px;">${content}</textarea>
         </div>
 
         ${paste.hasPassword ? `
         <div class="form-group">
-          <label for="password">密码</label>
+          <label for="edit-password">密码</label>
           <div class="password-input-container">
-            <input type="password" id="password" class="form-control" placeholder="输入密码以编辑">
-            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password')" title="显示密码">👁️</button>
+            <input type="password" id="edit-password" class="form-control" placeholder="输入密码以编辑">
+            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('edit-password')" title="显示密码">👁️</button>
           </div>
+          <small style="color: #666;">需要输入正确的密码才能编辑此粘贴板</small>
         </div>
         ` : ''}
 
@@ -1114,13 +1299,46 @@ export function getPastePage(pasteId, paste = null, requirePassword = false, err
 
   <script>
   function editPaste() {
-    document.getElementById('edit-section').style.display = 'block';
-    document.getElementById('content').focus();
+    const editSection = document.getElementById('edit-section');
+    if (editSection) {
+      editSection.style.display = editSection.style.display === 'none' ? 'block' : 'none';
+
+      // 如果显示编辑区域，聚焦到内容输入框
+      if (editSection.style.display === 'block') {
+        const contentField = document.getElementById('edit-content');
+        if (contentField) {
+          contentField.focus();
+          // 将光标移到文本末尾
+          contentField.setSelectionRange(contentField.value.length, contentField.value.length);
+        }
+      }
+    }
   }
 
   function cancelEdit() {
-    document.getElementById('edit-section').style.display = 'none';
+    const editSection = document.getElementById('edit-section');
+    if (editSection) {
+      editSection.style.display = 'none';
+
+      // 重置表单内容
+      const contentField = document.getElementById('edit-content');
+      const passwordField = document.getElementById('edit-password');
+
+      if (contentField) {
+        // 恢复原始内容
+        const originalContent = document.querySelector('.paste-text').textContent;
+        contentField.value = originalContent;
+      }
+
+      if (passwordField) {
+        passwordField.value = '';
+      }
+    }
   }
+
+
+
+
   </script>
 </body>
 </html>`;
