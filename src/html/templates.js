@@ -1263,6 +1263,7 @@ export function getPastePage(pasteId, paste = null, requirePassword = false, err
 
   const content = sanitizeHtml(paste.content);
   const createdAt = formatDate(paste.createdAt);
+  const updatedAt = paste.updatedAt ? formatDate(paste.updatedAt) : null;
   const expiresAt = paste.expiresAt ? formatTimeRemaining(paste.expiresAt) : '永不过期';
   const currentUrl = `${currentDomain}/${pasteId}`;
 
@@ -1284,6 +1285,7 @@ export function getPastePage(pasteId, paste = null, requirePassword = false, err
     <div class="card">
       <div class="paste-info">
         <span><strong>创建时间:</strong> ${createdAt}</span>
+        ${updatedAt ? `<span><strong>修改时间:</strong> ${updatedAt}</span>` : ''}
         <span><strong>过期时间:</strong> ${expiresAt}</span>
         <span><strong>查看次数:</strong> ${paste.views}</span>
         ${paste.hasPassword ? '<span><strong>🔒 密码保护</strong></span>' : ''}
@@ -1369,10 +1371,6 @@ export function getPastePage(pasteId, paste = null, requirePassword = false, err
       }
     }
   }
-
-
-
-
   </script>
 </body>
 </html>`;

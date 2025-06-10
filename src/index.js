@@ -271,6 +271,12 @@ async function updatePaste(pasteId, request, env, corsHeaders) {
     paste.content = content;
     paste.updatedAt = Date.now();
 
+    // Update password if provided
+    if (password) {
+      paste.hasPassword = true;
+      paste.passwordHash = await hashPassword(password);
+    }
+
     await env.PASTEBIN_KV.put(pasteId, JSON.stringify(paste));
 
     return new Response(JSON.stringify({ success: true }), {
@@ -661,6 +667,7 @@ async function handleAdminDashboard(request, env, corsHeaders) {
             id: key.name,
             content: paste.content.substring(0, 100) + (paste.content.length > 100 ? '...' : ''),
             createdAt: paste.createdAt,
+            updatedAt: paste.updatedAt || null,
             expiresAt: paste.expiresAt,
             views: paste.views || 0,
             hasPassword: paste.hasPassword || false
@@ -691,8 +698,6 @@ async function handleAdminDashboard(request, env, corsHeaders) {
     });
   }
 }
-
-
 
 // 处理管理API
 async function handleAdminAPI(request, env, corsHeaders) {
@@ -811,7 +816,8 @@ async function handleAdminAPI(request, env, corsHeaders) {
   if (path.match(/^\/admin\/api\/paste\/([^\/]+)$/) && method === 'PUT') {
     const pasteId = path.split('/')[4];
     try {
-      const { content } = await request.json();
+      const data = await request.json();
+      const { content, password } = data;
       const pasteData = await env.PASTEBIN_KV.get(pasteId);
 
       if (!pasteData) {
@@ -824,6 +830,12 @@ async function handleAdminAPI(request, env, corsHeaders) {
       const paste = JSON.parse(pasteData);
       paste.content = content;
       paste.updatedAt = Date.now();
+      
+      // Update password if provided
+      if (password) {
+        paste.hasPassword = true;
+        paste.passwordHash = await hashPassword(password);
+      }
 
       await env.PASTEBIN_KV.put(pasteId, JSON.stringify(paste));
 
@@ -841,33 +853,39 @@ async function handleAdminAPI(request, env, corsHeaders) {
   // 获取粘贴板完整内容
   if (path.match(/^\/admin\/api\/paste\/([^\/]+)\/content$/) && method === 'GET') {
     const pasteId = path.split('/')[4];
+    console.log('Admin API: Getting content for paste:', pasteId);
+    
     try {
+      console.log('Fetching paste from KV:', pasteId);
       const pasteData = await env.PASTEBIN_KV.get(pasteId);
 
       if (!pasteData) {
+        console.error('Paste not found:', pasteId);
         return new Response(JSON.stringify({ error: 'Paste not found' }), {
           status: 404,
           headers: { 'Content-Type': 'application/json', ...corsHeaders }
         });
       }
 
+      console.log('Paste found, parsing data');
       const paste = JSON.parse(pasteData);
 
+      console.log('Returning paste content, has password:', paste.hasPassword || false);
       return new Response(JSON.stringify({
         content: paste.content,
+        hasPassword: paste.hasPassword || false,
         success: true
       }), {
         headers: { 'Content-Type': 'application/json', ...corsHeaders }
       });
     } catch (error) {
-      return new Response(JSON.stringify({ error: 'Get content failed' }), {
+      console.error('Error getting paste content:', error);
+      return new Response(JSON.stringify({ error: 'Get content failed: ' + error.message }), {
         status: 500,
         headers: { 'Content-Type': 'application/json', ...corsHeaders }
       });
     }
   }
-
-
 
   console.log('❌ No matching route found for:', { path, method });
   return new Response('API endpoint not found', {

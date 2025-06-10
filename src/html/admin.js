@@ -793,10 +793,33 @@ export function getAdminLoginPage(errorMessage = '') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>后台管理登录 - XBin</title>
   ${ADMIN_CSS}
+  <style>
+    .home-button {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: transparent;
+      color: #667eea;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .home-button:hover {
+      background: rgba(102, 126, 234, 0.1);
+    }
+  </style>
 </head>
 <body>
   <div class="login-container">
     <div class="login-card">
+      <a href="/" class="home-button">🏠 返回首页</a>
+      
       <div class="login-header">
         <h1>🔐 后台管理</h1>
         <p>XBin 粘贴板管理系统</p>
@@ -865,8 +888,33 @@ export function getAdminDashboardPage(stats, pastes, currentPage = 1, totalPages
       <td><input type="checkbox" class="paste-checkbox" value="${paste.id}" onchange="updateSelectedCount()"></td>
       <td><code>${paste.id}</code></td>
       <td class="text-truncate" title="${paste.content.replace(/"/g, '&quot;')}">${paste.content}</td>
-      <td>${new Date(paste.createdAt).toLocaleString('zh-CN')}</td>
-      <td>${paste.expiresAt ? new Date(paste.expiresAt).toLocaleString('zh-CN') : '永不过期'}</td>
+      <td>${new Date(paste.createdAt).toLocaleString('zh-CN', {
+        year: 'numeric', 
+        month: 'numeric', 
+        day: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: false,
+        timeZone: 'Asia/Shanghai'
+      })}</td>
+      <td>${paste.updatedAt ? new Date(paste.updatedAt).toLocaleString('zh-CN', {
+        year: 'numeric', 
+        month: 'numeric', 
+        day: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: false,
+        timeZone: 'Asia/Shanghai'
+      }) : '无'}</td>
+      <td>${paste.expiresAt ? new Date(paste.expiresAt).toLocaleString('zh-CN', {
+        year: 'numeric', 
+        month: 'numeric', 
+        day: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: false,
+        timeZone: 'Asia/Shanghai'
+      }) : '永不过期'}</td>
       <td>${paste.views}</td>
       <td>
         ${paste.hasPassword ? '<span class="badge badge-warning">有密码</span>' : '<span class="badge badge-success">无密码</span>'}
@@ -898,6 +946,9 @@ export function getAdminDashboardPage(stats, pastes, currentPage = 1, totalPages
       <nav class="admin-nav">
         <div class="admin-logo">📋 XBin 管理后台</div>
         <div class="admin-user">
+          <a href="/" class="btn btn-sm" style="background: #28a745; margin-right: 10px;">
+            🏠 返回首页
+          </a>
           <a href="https://github.com/XCQ0607/xbin" target="_blank" class="btn btn-sm" style="background: #24292e; margin-right: 10px;">
             <svg style="width: 14px; height: 14px; fill: currentColor; margin-right: 5px;" viewBox="0 0 16 16">
               <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
@@ -950,6 +1001,7 @@ export function getAdminDashboardPage(stats, pastes, currentPage = 1, totalPages
               <th>ID</th>
               <th>内容预览</th>
               <th>创建时间</th>
+              <th>修改时间</th>
               <th>过期时间</th>
               <th>查看次数</th>
               <th>状态</th>
@@ -971,9 +1023,10 @@ export function getAdminDashboardPage(stats, pastes, currentPage = 1, totalPages
               </div>
               <div class="mobile-paste-content">${paste.content}</div>
               <div class="mobile-paste-meta">
-                <div><strong>创建:</strong> ${new Date(paste.createdAt).toLocaleDateString('zh-CN')}</div>
+                <div><strong>创建:</strong> ${new Date(paste.createdAt).toLocaleDateString('zh-CN', {timeZone: 'Asia/Shanghai'})}</div>
                 <div><strong>查看:</strong> ${paste.views}次</div>
-                <div><strong>过期:</strong> ${paste.expiresAt ? new Date(paste.expiresAt).toLocaleDateString('zh-CN') : '永不'}</div>
+                <div><strong>修改:</strong> ${paste.updatedAt ? new Date(paste.updatedAt).toLocaleDateString('zh-CN', {timeZone: 'Asia/Shanghai'}) : '无'}</div>
+                <div><strong>过期:</strong> ${paste.expiresAt ? new Date(paste.expiresAt).toLocaleDateString('zh-CN', {timeZone: 'Asia/Shanghai'}) : '永不'}</div>
                 <div><strong>状态:</strong> ${paste.hasPassword ? '🔒有密码' : '🔓无密码'}</div>
               </div>
               <div class="mobile-paste-actions">
@@ -1045,21 +1098,30 @@ export function getAdminDashboardPage(stats, pastes, currentPage = 1, totalPages
   </div>
 
   <!-- 编辑模态框 -->
-  <div id="editModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; overflow: hidden;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); padding: 40px; border-radius: 20px; width: 90%; max-width: 800px; max-height: 90vh; box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2); display: flex; flex-direction: column;">
-      <h3 style="margin-bottom: 30px; color: #333; font-size: 1.5rem; font-weight: 600; flex-shrink: 0;">编辑粘贴板</h3>
+  <div id="editModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; overflow-y: auto;">
+    <div style="position: relative; margin: 40px auto; background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); padding: 40px; border-radius: 20px; width: 90%; max-width: 800px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2);">
+      <h3 style="margin-bottom: 30px; color: #333; font-size: 1.5rem; font-weight: 600;">编辑粘贴板</h3>
 
-      <div class="form-group" style="flex-shrink: 0;">
+      <div class="form-group" style="margin-bottom: 20px;">
         <label style="color: #444; font-weight: 600; margin-bottom: 10px; display: block;">ID</label>
         <input type="text" id="editId" class="form-control" readonly style="background: #f8f9fa; color: #666;">
       </div>
-
-      <div class="form-group" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
-        <label style="color: #444; font-weight: 600; margin-bottom: 10px; display: block; flex-shrink: 0;">内容</label>
-        <textarea id="editContent" class="form-control" style="font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 14px; line-height: 1.6; resize: none; flex: 1; min-height: 300px; overflow-y: auto;"></textarea>
+      
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label style="color: #444; font-weight: 600; margin-bottom: 10px; display: block;">密码保护</label>
+        <div style="position: relative;">
+          <input type="password" id="editPassword" class="form-control" placeholder="密码保护">
+          <button type="button" onclick="togglePasswordVisibility('editPassword', 'editPasswordToggle')" id="editPasswordToggle" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px;">👁️</button>
+        </div>
+        <small style="color: #666; font-size: 0.85rem; margin-top: 5px; display: block;">留空则不更改现有密码，填入新密码则更新</small>
       </div>
 
-      <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px; flex-shrink: 0;">
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label style="color: #444; font-weight: 600; margin-bottom: 10px; display: block;">内容</label>
+        <textarea id="editContent" class="form-control" style="font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 14px; line-height: 1.6; resize: vertical; min-height: 300px; max-height: 50vh; width: 100%;"></textarea>
+      </div>
+
+      <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px;">
         <button class="btn btn-sm" onclick="closeEditModal()" style="background: #6c757d; width: auto; min-width: 80px;">取消</button>
         <button class="btn btn-sm btn-success" onclick="saveEdit()" style="width: auto; min-width: 80px;">保存</button>
       </div>
@@ -1217,7 +1279,7 @@ export function getAdminDashboardPage(stats, pastes, currentPage = 1, totalPages
                   refreshData();
                 }, 1500);
               } else {
-                showToast(result.error || \`清空失败 (状态码: \${response.status})\`, 'error');
+                showToast(result.error || '清空失败 (状态码: ' + response.status + ')', 'error');
                 console.error('Delete all failed:', result);
               }
             } catch (error) {
@@ -1234,20 +1296,58 @@ export function getAdminDashboardPage(stats, pastes, currentPage = 1, totalPages
     currentEditId = id;
     document.getElementById('editId').value = id;
     document.getElementById('editContent').value = '加载中...';
+    document.getElementById('editPassword').value = '';
     document.getElementById('editModal').style.display = 'block';
 
-    // 从服务器获取完整内容
     try {
-      const response = await fetch(\`/admin/api/paste/\${id}/content\`);
+      console.log('Fetching paste content:', '/admin/api/paste/' + id + '/content');
+      showToast('正在加载内容...', 'info');
+      
+      const response = await fetch('/admin/api/paste/' + id + '/content');
+      console.log('Response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
-        document.getElementById('editContent').value = data.content;
+        console.log('Response data:', data);
+        document.getElementById('editContent').value = data.content || '';
+        
+        // 更新密码输入框的提示文本
+        const passwordInput = document.getElementById('editPassword');
+        const passwordHelp = document.querySelector('#editPassword + small');
+        
+        if (data.hasPassword) {
+          // 有密码保护时
+          passwordInput.placeholder = "此粘贴板已有密码保护";
+          if (passwordHelp) {
+            passwordHelp.innerHTML = '留空则不更改现有密码，填入新密码则更新';
+          }
+        } else {
+          // 无密码保护时
+          passwordInput.placeholder = "此粘贴板无密码保护";
+          if (passwordHelp) {
+            passwordHelp.innerHTML = '留空则不更改现有密码，填入新密码则更新';
+          }
+        }
       } else {
-        showToast('获取内容失败', 'error');
+        console.error('Failed to get content:', response.status);
+        // 尝试获取错误详情
+        let errorText = '获取内容失败 (状态码: ' + response.status + ')';
+        try {
+          const errorData = await response.json();
+          console.error('Error data:', errorData);
+          if (errorData.error) {
+            errorText += ' - ' + errorData.error;
+          }
+        } catch (e) {
+          console.error('Could not parse error response', e);
+        }
+        
+        showToast(errorText, 'error');
         closeEditModal();
       }
     } catch (error) {
-      showToast('网络错误', 'error');
+      console.error('Network error:', error);
+      showToast('网络错误: ' + error.message, 'error');
       closeEditModal();
     }
   }
@@ -1261,25 +1361,63 @@ export function getAdminDashboardPage(stats, pastes, currentPage = 1, totalPages
     if (!currentEditId) return;
 
     const content = document.getElementById('editContent').value;
+    const password = document.getElementById('editPassword').value;
+
+    showToast('正在保存更改...', 'info');
+    console.log('Saving edit for ID:', currentEditId);
 
     try {
-      const response = await fetch(\`/admin/api/paste/\${currentEditId}\`, {
+      // Create data object with content and optional password
+      const data = { content };
+      if (password) {
+        data.password = password;
+        console.log('Password provided, will be updated');
+      }
+
+      console.log('Sending PUT request to:', '/admin/api/paste/' + currentEditId);
+      
+      const response = await fetch('/admin/api/paste/' + currentEditId, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ content })
+        body: JSON.stringify(data)
       });
 
+      console.log('Save response status:', response.status);
+      
       if (response.ok) {
-        showToast('保存成功', 'success');
+        let resultText = '保存成功';
+        try {
+          const result = await response.json();
+          console.log('Save result:', result);
+          if (result.message) {
+            resultText += ' - ' + result.message;
+          }
+        } catch (e) {
+          console.log('No JSON response for save operation');
+        }
+        
+        showToast(resultText, 'success');
         closeEditModal();
         refreshData();
       } else {
-        showToast('保存失败', 'error');
+        let errorText = '保存失败 (状态码: ' + response.status + ')';
+        try {
+          const errorData = await response.json();
+          console.error('Save error data:', errorData);
+          if (errorData.error) {
+            errorText += ' - ' + errorData.error;
+          }
+        } catch (e) {
+          console.error('Could not parse error response for save', e);
+        }
+        
+        showToast(errorText, 'error');
       }
     } catch (error) {
-      showToast('网络错误', 'error');
+      console.error('Save network error:', error);
+      showToast('网络错误: ' + error.message, 'error');
     }
   }
 
@@ -1335,18 +1473,18 @@ export function getAdminDashboardPage(stats, pastes, currentPage = 1, totalPages
 
     showConfirm(
       '批量删除确认',
-      \`确定要删除选中的 \${selectedIds.length} 个粘贴板吗？此操作不可恢复。\`,
+      '确定要删除选中的 ' + selectedIds.length + ' 个粘贴板吗？此操作不可恢复。',
       async function() {
         let successCount = 0;
         let failCount = 0;
 
         // 显示进度
-        showToast(\`正在删除 \${selectedIds.length} 个粘贴板...\`, 'info');
+        showToast('正在删除 ' + selectedIds.length + ' 个粘贴板...', 'info');
 
         // 逐个删除
         for (const id of selectedIds) {
           try {
-            const response = await fetch(\`/admin/api/paste/\${id}\`, {
+            const response = await fetch('/admin/api/paste/' + id, {
               method: 'DELETE'
             });
 
@@ -1362,9 +1500,9 @@ export function getAdminDashboardPage(stats, pastes, currentPage = 1, totalPages
 
         // 显示结果
         if (failCount === 0) {
-          showToast(\`成功删除 \${successCount} 个粘贴板\`, 'success');
+          showToast('成功删除 ' + successCount + ' 个粘贴板', 'success');
         } else {
-          showToast(\`删除完成：成功 \${successCount} 个，失败 \${failCount} 个\`, 'warning');
+          showToast('删除完成：成功 ' + successCount + ' 个，失败 ' + failCount + ' 个', 'warning');
         }
 
         // 刷新页面
@@ -1420,8 +1558,6 @@ export function getAdminDashboardPage(stats, pastes, currentPage = 1, totalPages
       button.textContent = '👁️';
     }
   }
-
-
 
   async function createPaste() {
     const customId = document.getElementById('createCustomId').value.trim();

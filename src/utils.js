@@ -29,9 +29,19 @@ export function isExpired(paste) {
   return Date.now() > paste.expiresAt;
 }
 
-// Format date for display
+// Format date for display in Beijing time (GMT+8)
 export function formatDate(timestamp) {
-  return new Date(timestamp).toLocaleString();
+  const options = { 
+    year: 'numeric', 
+    month: 'numeric', 
+    day: 'numeric', 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    second: '2-digit',
+    hour12: false,
+    timeZone: 'Asia/Shanghai'
+  };
+  return new Date(timestamp).toLocaleString('zh-CN', options);
 }
 
 // Format time remaining
